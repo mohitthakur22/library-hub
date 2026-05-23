@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Outfit', 'Inter', sans-serif;
+  --color-brand-navy: #0c1f3d;
+  --color-brand-navy-light: #152d52;
+  --color-brand-gold: #f5c518;
+  --color-brand-gold-dark: #d4a012;
+  --color-brand-cream: #fef9e7;
+}
+
+/* Dark theme (default) */
+:root,
+[data-theme='dark'] {
+  --surface: #060d18;
+  --surface-elevated: #0c1f3d;
+  --text-primary: #e8edf5;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
+  --glass-bg: rgba(12, 31, 61, 0.65);
+  --glass-border: rgba(245, 197, 24, 0.15);
+  --mesh-1: rgba(245, 197, 24, 0.12);
+  --mesh-2: rgba(12, 31, 61, 0.8);
+  --mesh-3: rgba(21, 45, 82, 0.6);
+  --logo-blend: screen;
+  --card-hover: rgba(255, 255, 255, 0.05);
+  --divider: rgba(255, 255, 255, 0.08);
+  --gradient-text-start: #fef9e7;
+  --gradient-text-end: #ffffff;
+}
+
+/* Light theme */
+[data-theme='light'] {
+  --surface: #f7f4eb;
+  --surface-elevated: #ffffff;
+  --text-primary: #0c1f3d;
+  --text-muted: #475569;
+  --text-subtle: #64748b;
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(12, 31, 61, 0.12);
+  --mesh-1: rgba(245, 197, 24, 0.2);
+  --mesh-2: rgba(12, 31, 61, 0.06);
+  --mesh-3: rgba(245, 197, 24, 0.08);
+  --logo-blend: multiply;
+  --card-hover: rgba(12, 31, 61, 0.04);
+  --divider: rgba(12, 31, 61, 0.1);
+  --gradient-text-start: #0c1f3d;
+  --gradient-text-end: #d4a012;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Anchor targets sit below fixed navbar */
+[id='features'],
+[id='how-it-works'],
+[id='facilities'],
+[id='faq'],
+[id='stats'] {
+  scroll-margin-top: 5.5rem;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  background: var(--surface);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.text-theme { color: var(--text-primary); }
+.text-theme-muted { color: var(--text-muted); }
+.text-theme-subtle { color: var(--text-subtle); }
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  transition: background 0.35s ease, border-color 0.35s ease;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--gradient-text-start) 0%, var(--color-brand-gold) 50%, var(--gradient-text-end) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-gold {
+  background: linear-gradient(135deg, var(--color-brand-gold) 0%, #ffe566 50%, var(--color-brand-gold-dark) 100%);
+}
+
+.neon-glow {
+  box-shadow:
+    0 0 40px rgba(245, 197, 24, 0.12),
+    0 0 80px rgba(12, 31, 61, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='light'] .neon-glow {
+  box-shadow:
+    0 4px 24px rgba(12, 31, 61, 0.08),
+    0 0 0 1px rgba(12, 31, 61, 0.06);
+}
+
+.bg-mesh {
+  background-color: var(--surface);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, var(--mesh-1) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 100% 50%, var(--mesh-2) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 30% at 0% 80%, var(--mesh-3) 0%, transparent 50%);
+  transition: background-color 0.35s ease;
+}
+
+/* Removes white/cream box around circular logo */
+.logo-knockout {
+  mix-blend-mode: var(--logo-blend);
+  isolation: isolate;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(245, 197, 24, 0.15) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-navy-light);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-gold-dark);
+}

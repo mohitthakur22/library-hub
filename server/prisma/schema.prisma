@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  password      String?
+  name          String
+  phone         String
+  collegeId     String?
+  photo         String?
+  role          String   @default("STUDENT")
+  googleId      String?  @unique
+  isBlocked     Boolean  @default(false)
+  otp           String?
+  otpExpires    DateTime?
+  emailVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  subscriptions Subscription[]
+  bookings      Booking[]
+  payments      Payment[]
+  checkIns      CheckIn[]
+  notifications Notification[]
+  issues        Issue[]
+  assignedSeats Seat[]   @relation("SeatAssignee")
+}
+
+model Seat {
+  id           String   @id @default(cuid())
+  number       String   @unique
+  row          Int
+  col          Int
+  status       String   @default("AVAILABLE")
+  assignedToId String?
+  assignedTo   User?    @relation("SeatAssignee", fields: [assignedToId], references: [id])
+
+  subscriptions Subscription[]
+  bookings      Booking[]
+}
+
+model Plan {
+  id           String   @id @default(cuid())
+  name         String
+  type         String
+  price        Float
+  durationDays Int
+  description  String?
+  features     String?
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId    String
+  plan      Plan     @relation(fields: [planId], references: [id])
+  seatId    String?
+  seat      Seat?    @relation(fields: [seatId], references: [id])
+  startDate DateTime
+  endDate   DateTime
+  status    String   @default("ACTIVE")
+
+  payments Payment[]
+  bookings Booking[]
+}
+
+model Booking {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  seatId         String
+  seat           Seat     @relation(fields: [seatId], references: [id])
+  subscriptionId String?
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  date           DateTime
+  status         String   @default("CONFIRMED")
+  type           String
+  createdAt      DateTime @default(now())
+
+  @@index([seatId, date])
+}
+
+model Payment {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionId String?
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  amount         Float
+  status         String   @default("PENDING")
+  dueDate        DateTime
+  paidAt         DateTime?
+  invoiceNumber  String   @unique
+  paymentMethod  String?
+  externalId     String?
+  createdAt      DateTime @default(now())
+}
+
+model CheckIn {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  seatId    String?
+  checkedAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("info")
+  read      Boolean  @default(false)
+  broadcast Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Issue {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject     String
+  description String
+  status      String   @default("OPEN")
+  createdAt   DateTime @default(now())
+}
+
+model BookingConflict {
+  id         String   @id @default(cuid())
+  seatId     String
+  seatNumber String
+  userId1    String
+  userId2    String
+  userName1  String
+  userName2  String
+  date       DateTime
+  resolved   Boolean  @default(false)
+  resolvedBy String?
+  resolution String?
+  createdAt  DateTime @default(now())
+}
