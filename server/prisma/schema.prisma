@@ -31,10 +31,10 @@ model User {
   notifications Notification[]  @relation("UserNotifications")
   issues        Issue[]         @relation("UserIssues")
   assignedSeats Seat[]          @relation("SeatAssignee")
-
-  @@index([email])
 }
- String   @id @default(auto()) @map("_id") @db.ObjectId
+
+model Seat {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
   number        String   @unique
   row           Int
   col           Int
@@ -44,12 +44,10 @@ model User {
 
   subscriptions Subscription[]  @relation("SeatSubscriptions")
   bookings      Booking[]       @relation("SeatBookings")
-
-  @@index([number])
-  subscriptions Subscription[]
-  bookings      Booking[]
 }
- String   @id @default(auto()) @map("_id") @db.ObjectId
+
+model Plan {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
   name          String
   type          String
   price         Float
@@ -60,10 +58,12 @@ model User {
   subscriptions Subscription[]  @relation("PlanSubscriptions")
 
   @@index([type])
+}
 
-  subscriptions Subscription[]auto()) @map("_id") @db.ObjectId
+model Subscription {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId
-  user      User     @relation("UserSubscriptions", fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation("UserSubscriptions", fields: [userId], references: [id])
   planId    String   @db.ObjectId
   plan      Plan     @relation("PlanSubscriptions", fields: [planId], references: [id])
   seatId    String?  @db.ObjectId
@@ -72,16 +72,18 @@ model User {
   endDate   DateTime
   status    String   @default("ACTIVE")
 
-  payments Payment[]      @relation("SubscriptionPayments")
-  bookings Booking[]      @relation("SubscriptionBookings")
+  payments Payment[]  @relation("SubscriptionPayments")
+  bookings Booking[]  @relation("SubscriptionBookings")
 
   @@index([userId])
   @@index([planId])
-  status    String   @default("ACTIVE")
+  @@index([seatId])
+}
 
-  payments Payment[]auto()) @map("_id") @db.ObjectId
+model Booking {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
   userId         String   @db.ObjectId
-  user           User     @relation("UserBookings", fields: [userId], references: [id], onDelete: Cascade)
+  user           User     @relation("UserBookings", fields: [userId], references: [id])
   seatId         String   @db.ObjectId
   seat           Seat     @relation("SeatBookings", fields: [seatId], references: [id])
   subscriptionId String?  @db.ObjectId
@@ -92,12 +94,13 @@ model User {
   createdAt      DateTime @default(now())
 
   @@index([seatId, date])
-  @@index([userIdme
-  status         String   @default("CONFIRMED")
-  type           String
-  createdAt      DateTime @default(now(auto()) @map("_id") @db.ObjectId
+  @@index([userId])
+}
+
+model Payment {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
   userId         String   @db.ObjectId
-  user           User     @relation("UserPayments", fields: [userId], references: [id], onDelete: Cascade)
+  user           User     @relation("UserPayments", fields: [userId], references: [id])
   subscriptionId String?  @db.ObjectId
   subscription   Subscription? @relation("SubscriptionPayments", fields: [subscriptionId], references: [id])
   amount         Float
@@ -109,21 +112,23 @@ model User {
   externalId     String?
   createdAt      DateTime @default(now())
 
-  @@index([userId]ING")
-  dueDate        DateTime
-  paidAt         DateTime?auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  user      User     @relation("UserCheckIns", fields: [userId], references: [id], onDelete: Cascade)
-  seatId    String?
-  checkedAt DateTime @default(now())
-
-  @@index([userId]now())
+  @@index([userId])
 }
 
 model CheckIn {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation("UserCheckIns", fields: [userId], references: [id])
+  seatId    String?  @db.ObjectId
+  checkedAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String?  @db.ObjectId
-  user      User?    @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  user      User?    @relation("UserNotifications", fields: [userId], references: [id])
   title     String
   message   String
   type      String   @default("info")
@@ -131,22 +136,23 @@ model CheckIn {
   broadcast Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  @@index([userId]uid())
-  userId    String?
-  user      User?    @relation(fieldauto()) @map("_id") @db.ObjectId
+  @@index([userId])
+}
+
+model Issue {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   userId      String   @db.ObjectId
-  user        User     @relation("UserIssues", fields: [userId], references: [id], onDelete: Cascade)
+  user        User     @relation("UserIssues", fields: [userId], references: [id])
   subject     String
   description String
   status      String   @default("OPEN")
   createdAt   DateTime @default(now())
 
-  @@index([userId]
+  @@index([userId])
 }
 
-model Issue {
-  id          String   @id @default(cuid())
-  userId      Stringauto()) @map("_id") @db.ObjectId
+model BookingConflict {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
   seatId     String   @db.ObjectId
   seatNumber String
   userId1    String   @db.ObjectId
@@ -159,14 +165,5 @@ model Issue {
   resolution String?
   createdAt  DateTime @default(now())
 
-  @@index([seatId, date]
-  userId1    String
-  userId2    String
-  userName1  String
-  userName2  String
-  date       DateTime
-  resolved   Boolean  @default(false)
-  resolvedBy String?
-  resolution String?
-  createdAt  DateTime @default(now())
+  @@index([seatId, date])
 }
