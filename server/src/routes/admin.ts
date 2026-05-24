@@ -93,8 +93,9 @@ router.post('/students', async (req, res) => {
 
 router.patch('/students/:id', async (req, res) => {
   const { name, phone, collegeId, isBlocked } = req.body;
+  const userId = String(req.params.id);
   const user = await prisma.user.update({
-    where: { id: req.params.id },
+    where: { id: userId },
     data: { name, phone, collegeId, isBlocked },
   });
   res.json(user);
@@ -110,8 +111,9 @@ router.get('/conflicts', async (_req, res) => {
 
 router.post('/conflicts/:id/resolve', async (req: AuthRequest, res) => {
   const { resolution, winnerId } = req.body;
+  const conflictId = String(req.params.id);
   const conflict = await prisma.bookingConflict.findUnique({
-    where: { id: req.params.id },
+    where: { id: conflictId },
   });
   if (!conflict) return res.status(404).json({ error: 'Conflict not found' });
 

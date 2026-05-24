@@ -14,8 +14,9 @@ router.get('/my', authenticate, async (req: AuthRequest, res) => {
 });
 
 router.post('/:id/pay', authenticate, async (req: AuthRequest, res) => {
+  const paymentId = String(req.params.id);
   const payment = await prisma.payment.findFirst({
-    where: { id: req.params.id, userId: req.user!.id },
+    where: { id: paymentId, userId: req.user!.id },
   });
   if (!payment) return res.status(404).json({ error: 'Payment not found' });
 
@@ -51,9 +52,10 @@ router.get('/', authenticate, requireAdmin, async (_req, res) => {
 });
 
 router.patch('/:id/status', authenticate, requireAdmin, async (req, res) => {
+  const paymentId = String(req.params.id);
   const { status } = req.body;
   const payment = await prisma.payment.update({
-    where: { id: req.params.id },
+    where: { id: paymentId },
     data: {
       status,
       paidAt: status === 'PAID' ? new Date() : null,

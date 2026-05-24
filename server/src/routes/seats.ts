@@ -60,9 +60,10 @@ router.post('/book', authenticate, async (req: AuthRequest, res) => {
 });
 
 router.patch('/:id/status', authenticate, requireAdmin, async (req, res) => {
+  const seatId = String(req.params.id);
   const { status } = req.body;
   const seat = await prisma.seat.update({
-    where: { id: req.params.id },
+    where: { id: seatId },
     data: { status },
   });
   res.json(seat);
@@ -75,7 +76,8 @@ router.post('/', authenticate, requireAdmin, async (req, res) => {
 });
 
 router.delete('/:id', authenticate, requireAdmin, async (req, res) => {
-  await prisma.seat.delete({ where: { id: req.params.id } });
+  const seatId = String(req.params.id);
+  await prisma.seat.delete({ where: { id: seatId } });
   res.json({ message: 'Seat removed' });
 });
 

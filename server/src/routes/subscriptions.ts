@@ -11,7 +11,7 @@ router.get('/my', authenticate, async (req: AuthRequest, res) => {
   const subs = await prisma.subscription.findMany({
     where: { userId: req.user!.id },
     include: { plan: true, seat: true, payments: { orderBy: { createdAt: 'desc' }, take: 3 } },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { startDate: 'desc' },
   });
   res.json(subs);
 });
@@ -86,8 +86,9 @@ router.post('/subscribe', authenticate, async (req: AuthRequest, res) => {
 });
 
 router.post('/:id/extend', authenticate, async (req: AuthRequest, res) => {
+  const subscriptionId = String(req.params.id);
   const sub = await prisma.subscription.findFirst({
-    where: { id: req.params.id, userId: req.user!.id },
+    where: { id: subscriptionId, userId: req.user!.id },
     include: { plan: true },
   });
   if (!sub) return res.status(404).json({ error: 'Subscription not found' });

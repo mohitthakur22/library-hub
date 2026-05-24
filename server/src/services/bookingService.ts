@@ -30,7 +30,7 @@ export async function getSeatAvailability(date: Date) {
   });
 
   return seats.map((seat) => {
-    let displayStatus: SeatStatus = seat.status;
+    let displayStatus: SeatStatus = seat.status as SeatStatus;
     const fixedSub = seat.subscriptions.find((s) => s.plan.type === 'FIXED');
     const rotationalBooking = seat.bookings.find((b) => b.type === 'ROTATIONAL' || b.type === 'DAY_PASS');
 
@@ -85,7 +85,7 @@ export async function bookSeat(params: {
       date: { gte: dayStart, lte: dayEnd },
       status: { in: ['CONFIRMED', 'PENDING'] },
     },
-    include: { user: true },
+    include: { user: true, seat: true },
   });
 
   const fixedSub = seat.subscriptions.find((s) => s.plan.type === 'FIXED');
