@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String   @id @default(cuid())
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
   email         String   @unique
   password      String?
   name          String
@@ -24,78 +24,82 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  subscriptions Subscription[]  @relation("UserSubscriptions")
+  bookings      Booking[]       @relation("UserBookings")
+  payments      Payment[]       @relation("UserPayments")
+  checkIns      CheckIn[]       @relation("UserCheckIns")
+  notifications Notification[]  @relation("UserNotifications")
+  issues        Issue[]         @relation("UserIssues")
+  assignedSeats Seat[]          @relation("SeatAssignee")
+
+  @@index([email])
+}
+ String   @id @default(auto()) @map("_id") @db.ObjectId
+  number        String   @unique
+  row           Int
+  col           Int
+  status        String   @default("AVAILABLE")
+  assignedToId  String?  @db.ObjectId
+  assignedTo    User?    @relation("SeatAssignee", fields: [assignedToId], references: [id])
+
+  subscriptions Subscription[]  @relation("SeatSubscriptions")
+  bookings      Booking[]       @relation("SeatBookings")
+
+  @@index([number])
   subscriptions Subscription[]
   bookings      Booking[]
-  payments      Payment[]
-  checkIns      CheckIn[]
-  notifications Notification[]
-  issues        Issue[]
-  assignedSeats Seat[]   @relation("SeatAssignee")
 }
+ String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  type          String
+  price         Float
+  durationDays  Int
+  description   String?
+  features      String?
 
-model Seat {
-  id           String   @id @default(cuid())
-  number       String   @unique
-  row          Int
-  col          Int
-  status       String   @default("AVAILABLE")
-  assignedToId String?
-  assignedTo   User?    @relation("SeatAssignee", fields: [assignedToId], references: [id])
+  subscriptions Subscription[]  @relation("PlanSubscriptions")
 
-  subscriptions Subscription[]
-  bookings      Booking[]
-}
+  @@index([type])
 
-model Plan {
-  id           String   @id @default(cuid())
-  name         String
-  type         String
-  price        Float
-  durationDays Int
-  description  String?
-  features     String?
-
-  subscriptions Subscription[]
-}
-
-model Subscription {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  planId    String
-  plan      Plan     @relation(fields: [planId], references: [id])
-  seatId    String?
-  seat      Seat?    @relation(fields: [seatId], references: [id])
+  subscriptions Subscription[]auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation("UserSubscriptions", fields: [userId], references: [id], onDelete: Cascade)
+  planId    String   @db.ObjectId
+  plan      Plan     @relation("PlanSubscriptions", fields: [planId], references: [id])
+  seatId    String?  @db.ObjectId
+  seat      Seat?    @relation("SeatSubscriptions", fields: [seatId], references: [id])
   startDate DateTime
   endDate   DateTime
   status    String   @default("ACTIVE")
 
-  payments Payment[]
-  bookings Booking[]
-}
+  payments Payment[]      @relation("SubscriptionPayments")
+  bookings Booking[]      @relation("SubscriptionBookings")
 
-model Booking {
-  id             String   @id @default(cuid())
-  userId         String
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  seatId         String
-  seat           Seat     @relation(fields: [seatId], references: [id])
-  subscriptionId String?
-  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  @@index([userId])
+  @@index([planId])
+  status    String   @default("ACTIVE")
+
+  payments Payment[]auto()) @map("_id") @db.ObjectId
+  userId         String   @db.ObjectId
+  user           User     @relation("UserBookings", fields: [userId], references: [id], onDelete: Cascade)
+  seatId         String   @db.ObjectId
+  seat           Seat     @relation("SeatBookings", fields: [seatId], references: [id])
+  subscriptionId String?  @db.ObjectId
+  subscription   Subscription? @relation("SubscriptionBookings", fields: [subscriptionId], references: [id])
   date           DateTime
   status         String   @default("CONFIRMED")
   type           String
   createdAt      DateTime @default(now())
 
   @@index([seatId, date])
-}
-
-model Payment {
-  id             String   @id @default(cuid())
-  userId         String
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subscriptionId String?
-  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  @@index([userIdme
+  status         String   @default("CONFIRMED")
+  type           String
+  createdAt      DateTime @default(now(auto()) @map("_id") @db.ObjectId
+  userId         String   @db.ObjectId
+  user           User     @relation("UserPayments", fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionId String?  @db.ObjectId
+  subscription   Subscription? @relation("SubscriptionPayments", fields: [subscriptionId], references: [id])
   amount         Float
   status         String   @default("PENDING")
   dueDate        DateTime
@@ -104,42 +108,58 @@ model Payment {
   paymentMethod  String?
   externalId     String?
   createdAt      DateTime @default(now())
+
+  @@index([userId]ING")
+  dueDate        DateTime
+  paidAt         DateTime?auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation("UserCheckIns", fields: [userId], references: [id], onDelete: Cascade)
+  seatId    String?
+  checkedAt DateTime @default(now())
+
+  @@index([userId]now())
 }
 
 model CheckIn {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  seatId    String?
-  checkedAt DateTime @default(now())
-}
-
-model Notification {
-  id        String   @id @default(cuid())
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String?  @db.ObjectId
+  user      User?    @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
   title     String
   message   String
   type      String   @default("info")
   read      Boolean  @default(false)
   broadcast Boolean  @default(false)
   createdAt DateTime @default(now())
-}
 
-model Issue {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId]uid())
+  userId    String?
+  user      User?    @relation(fieldauto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  user        User     @relation("UserIssues", fields: [userId], references: [id], onDelete: Cascade)
   subject     String
   description String
   status      String   @default("OPEN")
   createdAt   DateTime @default(now())
+
+  @@index([userId]
 }
 
-model BookingConflict {
-  id         String   @id @default(cuid())
-  seatId     String
+model Issue {
+  id          String   @id @default(cuid())
+  userId      Stringauto()) @map("_id") @db.ObjectId
+  seatId     String   @db.ObjectId
   seatNumber String
+  userId1    String   @db.ObjectId
+  userId2    String   @db.ObjectId
+  userName1  String
+  userName2  String
+  date       DateTime
+  resolved   Boolean  @default(false)
+  resolvedBy String?  @db.ObjectId
+  resolution String?
+  createdAt  DateTime @default(now())
+
+  @@index([seatId, date]
   userId1    String
   userId2    String
   userName1  String
