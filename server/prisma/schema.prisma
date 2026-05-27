@@ -16,7 +16,7 @@ model User {
   collegeId     String?
   photo         String?
   role          String   @default("STUDENT")
-  googleId      String?  @unique
+  googleId      String?  @db.String
   isBlocked     Boolean  @default(false)
   otp           String?
   otpExpires    DateTime?
