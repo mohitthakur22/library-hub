@@ -181,13 +181,17 @@ export function Landing() {
             </p>
 
             <div className="flex flex-wrap justify-center gap-4">
-              <Button size="lg" onClick={() => (window.location.href = '/auth/register')}>
-                Book Your Seat
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="lg" onClick={() => (window.location.href = '/pricing')}>
+              <Link to="/auth/register">
+                <Button size="lg">
+                  Book Your Seat
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+              <Link to="/pricing">
+                <Button variant="outline" size="lg">
                 View Plans
-              </Button>
+                </Button>
+              </Link>
             </div>
           </motion.div>
 
