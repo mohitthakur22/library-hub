@@ -1,8 +1,8 @@
 {
-  "buildCommand": "cd client && npm run build",
-  "outputDirectory": "client/dist",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "env": {
-    "VITE_API_URL": "https://library-hub-al91.onrender.com/api"
+    "VITE_API_URL": "@VITE_API_URL"
   },
   "rewrites": [
     {
