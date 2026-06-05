@@ -148,26 +148,59 @@ export function Navbar() {
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
           className="border-t border-brand-gold/10 px-4 py-4 md:hidden"
         >
-          {links.map((l) => (
-            <NavItemLink
-              key={l.to}
-              item={l}
-              className="block py-2 text-theme-muted hover:text-brand-gold"
-              onNavigate={closeMobile}
-            />
-          ))}
-          {!token && (
-            <div className="flex gap-2 mt-4 pt-4 border-t border-[var(--divider)]">
-              <Button variant="outline" className="flex-1" onClick={() => navigate('/auth/login')}>
-                Login
-              </Button>
-              <Button className="flex-1" onClick={() => navigate('/auth/register')}>
-                Join
-              </Button>
-            </div>
-          )}
+          <div className="flex flex-col gap-2">
+            {links.map((l) => (
+              <NavItemLink
+                key={l.to}
+                item={l}
+                className="block px-3 py-3 rounded-lg text-sm text-theme-muted hover:text-brand-gold hover:bg-brand-gold/5 transition-colors"
+                onNavigate={closeMobile}
+              />
+            ))}
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-brand-gold/10 flex flex-col gap-2">
+            {token ? (
+              <>
+                <div className="px-3 py-2">
+                  <p className="text-sm text-theme-muted">
+                    Hi, <span className="text-brand-gold font-medium">{user?.name?.split(' ')[0]}</span>
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-center"
+                  onClick={() => {
+                    logout();
+                    navigate('/');
+                    closeMobile();
+                  }}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" className="w-full" onClick={() => {
+                  navigate('/auth/login');
+                  closeMobile();
+                }}>
+                  Login
+                </Button>
+                <Button className="w-full" onClick={() => {
+                  navigate('/auth/register');
+                  closeMobile();
+                }}>
+                  Join Now
+                </Button>
+              </>
+            )}
+          </div>
         </motion.div>
       )}
     </motion.nav>
